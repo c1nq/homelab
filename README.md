@@ -3,11 +3,12 @@
 ![Proxmox](https://img.shields.io/badge/Proxmox-VE%209.1.1-E57000?style=for-the-badge&logo=proxmox&logoColor=white)
 ![Cisco](https://img.shields.io/badge/Cisco-Catalyst%203560-1BA0D7?style=for-the-badge&logo=cisco&logoColor=white)
 ![pfSense](https://img.shields.io/badge/pfSense-2.6.0-212121?style=for-the-badge&logo=pfsense&logoColor=white)
+![TrueNAS](https://img.shields.io/badge/TrueNAS-SCALE%2024.04-0095D5?style=for-the-badge&logo=truenas&logoColor=white)
 ![Debian](https://img.shields.io/badge/Debian-Trixie-A81D33?style=for-the-badge&logo=debian&logoColor=white)
 ![Status](https://img.shields.io/badge/Status-In%20Progress-yellow?style=for-the-badge)
 
 > **Vista College — Niveau 4 System Engineer**  
-> Homelab opgebouwd op een Intel enterprise rack server met RAID storage, VLAN segmentatie, pfSense firewall en Proxmox VE als hypervisor.
+> Homelab opgebouwd op een Intel enterprise rack server met RAID storage, VLAN segmentatie, pfSense firewall, TrueNAS NAS en Proxmox VE als hypervisor.
 
 ---
 
@@ -73,6 +74,7 @@ Cisco Catalyst 3560 ── 192.168.1.2
 | Proxmox | 192.168.1.100 | Hypervisor |
 | pfSense WAN | 192.168.1.101 | Firewall beheer |
 | pfSense LAN | 192.168.20.1 | Gateway VLAN 20 |
+| TrueNAS | 192.168.1.110 | NAS / SMB share |
 | Cisco switch | 192.168.1.2 | Netwerk beheer |
 
 ---
@@ -105,18 +107,13 @@ iface vmbr0.30 inet static
 ---
 
 ### MegaCLI — Schijven zichtbaar maken
-
-Proxmox VE 9 draait op Debian Trixie waar `libncurses5` niet meer beschikbaar is. Oplossing: handmatig installeren van Debian Bookworm.
 ```bash
 wget http://ftp.debian.org/debian/pool/main/n/ncurses/libtinfo5_6.4-4_amd64.deb
 wget http://ftp.debian.org/debian/pool/main/n/ncurses/libncurses5_6.4-4_amd64.deb
 dpkg -i libtinfo5_6.4-4_amd64.deb
 dpkg -i libncurses5_6.4-4_amd64.deb
 
-# Alle physical drives weergeven
 /opt/MegaRAID/MegaCli/MegaCli64 -PDList -aALL | grep -E "Slot Number|Raw Size|Firmware state"
-
-# RAID arrays weergeven
 /opt/MegaRAID/MegaCli/MegaCli64 -LDInfo -Lall -aALL
 ```
 
@@ -181,15 +178,26 @@ ssh -oKexAlgorithms=+diffie-hellman-group1-sha1 \
 | RAM | 2048 MB |
 | Disk | 20 GB (storage-7tb) |
 | WAN | 192.168.1.101 (vmbr0) |
-| LAN | 192.168.20.1 (vmbr0, VLAN 20) |
+| LAN | 192.168.20.1 (vmbr0) |
 | Webinterface | http://192.168.1.101 |
 | Versie | pfSense CE 2.6.0 |
 
-**Firewall regel voor WAN toegang webinterface:**
-- Action: Pass
-- Interface: WAN
-- Protocol: TCP
-- Destination: WAN address, poort 80 + 443
+---
+
+### TrueNAS SCALE — NAS VM
+
+| Instelling | Waarde |
+|-----------|--------|
+| VM ID | 101 |
+| CPU | 4 cores |
+| RAM | 8192 MB |
+| Boot disk | 50 GB (storage-7tb) |
+| Data disks | 2x 500 GB Mirror (ZFS) |
+| IP | 192.168.1.110 |
+| Webinterface | http://192.168.1.110 |
+| Versie | TrueNAS SCALE 24.04 |
+| SMB share | \\192.168.1.110\data |
+| Pool | datapool — ZFS Mirror, 480 GB beschikbaar |
 
 ---
 
@@ -206,7 +214,9 @@ ssh -oKexAlgorithms=+diffie-hellman-group1-sha1 \
 - [x] Proxmox VLAN interfaces actief (vmbr0.10 / .20 / .30)
 - [x] pfSense VM geïnstalleerd en geconfigureerd
 - [x] pfSense webinterface bereikbaar via WAN
-- [ ] TrueNAS VM aanmaken
+- [x] TrueNAS SCALE VM geïnstalleerd
+- [x] ZFS Mirror pool aangemaakt (2x 500GB)
+- [x] SMB share actief en bereikbaar vanaf Windows
 - [ ] Windows Server 2022 VM
 - [ ] Active Directory + DNS + DHCP
 - [ ] Ubuntu Server met Ansible + Docker
