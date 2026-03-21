@@ -2,11 +2,12 @@
 
 ![Proxmox](https://img.shields.io/badge/Proxmox-VE%209.1.1-E57000?style=for-the-badge&logo=proxmox&logoColor=white)
 ![Cisco](https://img.shields.io/badge/Cisco-Catalyst%203560-1BA0D7?style=for-the-badge&logo=cisco&logoColor=white)
+![pfSense](https://img.shields.io/badge/pfSense-2.6.0-212121?style=for-the-badge&logo=pfsense&logoColor=white)
 ![Debian](https://img.shields.io/badge/Debian-Trixie-A81D33?style=for-the-badge&logo=debian&logoColor=white)
 ![Status](https://img.shields.io/badge/Status-In%20Progress-yellow?style=for-the-badge)
 
 > **Vista College — Niveau 4 System Engineer**  
-> Homelab opgebouwd op een Intel enterprise rack server met RAID storage, VLAN segmentatie en Proxmox VE als hypervisor.
+> Homelab opgebouwd op een Intel enterprise rack server met RAID storage, VLAN segmentatie, pfSense firewall en Proxmox VE als hypervisor.
 
 ---
 
@@ -65,6 +66,15 @@ Cisco Catalyst 3560 ── 192.168.1.2
 | 20 | servers | 192.168.20.0/24 | Virtuele machines |
 | 30 | storage | 192.168.30.0/24 | NAS / backup |
 
+### VM / Service IP-schema
+
+| Host | IP | Functie |
+|------|----|---------|
+| Proxmox | 192.168.1.100 | Hypervisor |
+| pfSense WAN | 192.168.1.101 | Firewall beheer |
+| pfSense LAN | 192.168.20.1 | Gateway VLAN 20 |
+| Cisco switch | 192.168.1.2 | Netwerk beheer |
+
 ---
 
 ## ⚙️ Configuratie
@@ -92,6 +102,8 @@ iface vmbr0.30 inet static
         address 192.168.30.1/24
 ```
 
+---
+
 ### MegaCLI — Schijven zichtbaar maken
 
 Proxmox VE 9 draait op Debian Trixie waar `libncurses5` niet meer beschikbaar is. Oplossing: handmatig installeren van Debian Bookworm.
@@ -108,6 +120,8 @@ dpkg -i libncurses5_6.4-4_amd64.deb
 /opt/MegaRAID/MegaCli/MegaCli64 -LDInfo -Lall -aALL
 ```
 
+---
+
 ### Storage — Mounten in Proxmox
 ```bash
 mkfs.ext4 /dev/sdb
@@ -123,6 +137,8 @@ systemctl daemon-reload && mount -a
 |------------|-----|------------|
 | storage-2tb | /mnt/storage-2tb | 2.6 TB |
 | storage-7tb | /mnt/storage-7tb | 6.9 TB |
+
+---
 
 ### Cisco Catalyst 3560 — VLANs & Trunks
 ```
@@ -156,6 +172,27 @@ ssh -oKexAlgorithms=+diffie-hellman-group1-sha1 \
 
 ---
 
+### pfSense — Firewall VM
+
+| Instelling | Waarde |
+|-----------|--------|
+| VM ID | 100 |
+| CPU | 2 cores |
+| RAM | 2048 MB |
+| Disk | 20 GB (storage-7tb) |
+| WAN | 192.168.1.101 (vmbr0) |
+| LAN | 192.168.20.1 (vmbr0, VLAN 20) |
+| Webinterface | http://192.168.1.101 |
+| Versie | pfSense CE 2.6.0 |
+
+**Firewall regel voor WAN toegang webinterface:**
+- Action: Pass
+- Interface: WAN
+- Protocol: TCP
+- Destination: WAN address, poort 80 + 443
+
+---
+
 ## ✅ Voortgang
 
 - [x] Proxmox VE 9.1.1 geïnstalleerd
@@ -167,9 +204,17 @@ ssh -oKexAlgorithms=+diffie-hellman-group1-sha1 \
 - [x] Trunk poorten actief op Fa0/1 en Fa0/3
 - [x] SSH toegang op Cisco switch
 - [x] Proxmox VLAN interfaces actief (vmbr0.10 / .20 / .30)
-- [ ] Eerste VM aanmaken
-- [ ] Slot 5 (2.728 TB) als extra storage configureren
-- [ ] DHCP per VLAN instellen
+- [x] pfSense VM geïnstalleerd en geconfigureerd
+- [x] pfSense webinterface bereikbaar via WAN
+- [ ] TrueNAS VM aanmaken
+- [ ] Windows Server 2022 VM
+- [ ] Active Directory + DNS + DHCP
+- [ ] Ubuntu Server met Ansible + Docker
+- [ ] Grafana + Prometheus monitoring
+- [ ] Wazuh SIEM
+- [ ] Kali Linux VM
+- [ ] WireGuard VPN
+- [ ] Gitea + CI/CD pipeline
 
 ---
 
