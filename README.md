@@ -4,11 +4,12 @@
 ![Cisco](https://img.shields.io/badge/Cisco-Catalyst%203560-1BA0D7?style=for-the-badge&logo=cisco&logoColor=white)
 ![pfSense](https://img.shields.io/badge/pfSense-2.6.0-212121?style=for-the-badge&logo=pfsense&logoColor=white)
 ![TrueNAS](https://img.shields.io/badge/TrueNAS-SCALE%2024.04-0095D5?style=for-the-badge&logo=truenas&logoColor=white)
+![Windows Server](https://img.shields.io/badge/Windows%20Server-2022-0078D6?style=for-the-badge&logo=windows&logoColor=white)
 ![Debian](https://img.shields.io/badge/Debian-Trixie-A81D33?style=for-the-badge&logo=debian&logoColor=white)
 ![Status](https://img.shields.io/badge/Status-In%20Progress-yellow?style=for-the-badge)
 
 > **Vista College — Niveau 4 System Engineer**  
-> Homelab opgebouwd op een Intel enterprise rack server met RAID storage, VLAN segmentatie, pfSense firewall, TrueNAS NAS en Proxmox VE als hypervisor.
+> Homelab opgebouwd op een Intel enterprise rack server met RAID storage, VLAN segmentatie, pfSense firewall, TrueNAS NAS, Windows Server 2022 met Active Directory en Proxmox VE als hypervisor.
 
 ---
 
@@ -75,6 +76,7 @@ Cisco Catalyst 3560 ── 192.168.1.2
 | pfSense WAN | 192.168.1.101 | Firewall beheer |
 | pfSense LAN | 192.168.20.1 | Gateway VLAN 20 |
 | TrueNAS | 192.168.1.110 | NAS / SMB share |
+| Windows Server | 192.168.1.102 | AD, DNS, DHCP |
 | Cisco switch | 192.168.1.2 | Netwerk beheer |
 
 ---
@@ -201,6 +203,31 @@ ssh -oKexAlgorithms=+diffie-hellman-group1-sha1 \
 
 ---
 
+### Windows Server 2022 — AD/DNS/DHCP VM
+
+| Instelling | Waarde |
+|-----------|--------|
+| VM ID | 102 |
+| CPU | 4 cores |
+| RAM | 4096 MB |
+| Disk | 60 GB (storage-7tb) |
+| IP | 192.168.1.102 |
+| Versie | Windows Server 2022 Standard Evaluation |
+| Domein | homelab.local |
+
+**Active Directory configuratie:**
+- Forest/Domain: `homelab.local`
+- Functional level: Windows Server 2016
+- OUs: `Medewerkers`, `Werkstations`, `IT-Beheer`
+- Gebruiker: `s.enkelmans@homelab.local`
+
+**DHCP scope:**
+- Range: `192.168.1.150 — 192.168.1.200`
+- Gateway: `192.168.1.254`
+- DNS: `192.168.1.102`
+
+---
+
 ## ✅ Voortgang
 
 - [x] Proxmox VE 9.1.1 geïnstalleerd
@@ -217,8 +244,11 @@ ssh -oKexAlgorithms=+diffie-hellman-group1-sha1 \
 - [x] TrueNAS SCALE VM geïnstalleerd
 - [x] ZFS Mirror pool aangemaakt (2x 500GB)
 - [x] SMB share actief en bereikbaar vanaf Windows
-- [ ] Windows Server 2022 VM
-- [ ] Active Directory + DNS + DHCP
+- [x] Windows Server 2022 VM geïnstalleerd
+- [x] Active Directory domein `homelab.local` opgezet
+- [x] DNS server geconfigureerd
+- [x] DHCP scope aangemaakt en actief
+- [x] Gebruiker `s.enkelmans@homelab.local` aangemaakt
 - [ ] Ubuntu Server met Ansible + Docker
 - [ ] Grafana + Prometheus monitoring
 - [ ] Wazuh SIEM
