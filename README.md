@@ -1,4 +1,13 @@
 # 🖥️ Homelab — Proxmox VE op Enterprise Hardware
+## 📸 Screenshots
+
+| Proxmox | TrueNAS |
+|---------|---------|
+| ![Proxmox](screenshots/proxmox.png) | ![TrueNAS](screenshots/truenass.png) |
+
+| Active Directory | Cisco Switch |
+|-----------------|--------------|
+| ![AD](screenshots/ad.png) | ![Cisco](screenshots/cisco.png) |
 
 ![Proxmox](https://img.shields.io/badge/Proxmox-VE%209.1.1-E57000?style=for-the-badge&logo=proxmox&logoColor=white)
 ![Cisco](https://img.shields.io/badge/Cisco-Catalyst%203560-1BA0D7?style=for-the-badge&logo=cisco&logoColor=white)
