@@ -1,4 +1,12 @@
 # 🖥️ Homelab — Proxmox VE op Enterprise Hardware
+
+![Proxmox](https://img.shields.io/badge/Proxmox-VE%209.1.1-E57000?style=for-the-badge&logo=proxmox&logoColor=white)
+![Cisco](https://img.shields.io/badge/Cisco-Catalyst%203560-1BA0D7?style=for-the-badge&logo=cisco&logoColor=white)
+![pfSense](https://img.shields.io/badge/pfSense-2.6.0-212121?style=for-the-badge&logo=pfsense&logoColor=white)
+![TrueNAS](https://img.shields.io/badge/TrueNAS-SCALE%2024.04-0095D5?style=for-the-badge&logo=truenas&logoColor=white)
+![Windows Server](https://img.shields.io/badge/Windows%20Server-2022-0078D6?style=for-the-badge&logo=windows&logoColor=white)
+![Debian](https://img.shields.io/badge/Debian-Trixie-A81D33?style=for-the-badge&logo=debian&logoColor=white)
+![Status](https://img.shields.io/badge/Status-In%20Progress-yellow?style=for-the-badge)
 ## 📸 Screenshots
 
 | Proxmox | TrueNAS |
@@ -8,15 +16,6 @@
 | Active Directory | Cisco Switch |
 |-----------------|--------------|
 | ![AD](screenshots/ad.png) | ![Cisco](screenshots/cisco.png) |
-
-![Proxmox](https://img.shields.io/badge/Proxmox-VE%209.1.1-E57000?style=for-the-badge&logo=proxmox&logoColor=white)
-![Cisco](https://img.shields.io/badge/Cisco-Catalyst%203560-1BA0D7?style=for-the-badge&logo=cisco&logoColor=white)
-![pfSense](https://img.shields.io/badge/pfSense-2.6.0-212121?style=for-the-badge&logo=pfsense&logoColor=white)
-![TrueNAS](https://img.shields.io/badge/TrueNAS-SCALE%2024.04-0095D5?style=for-the-badge&logo=truenas&logoColor=white)
-![Windows Server](https://img.shields.io/badge/Windows%20Server-2022-0078D6?style=for-the-badge&logo=windows&logoColor=white)
-![Debian](https://img.shields.io/badge/Debian-Trixie-A81D33?style=for-the-badge&logo=debian&logoColor=white)
-![Status](https://img.shields.io/badge/Status-In%20Progress-yellow?style=for-the-badge)
-
 > **Vista College — Niveau 4 System Engineer**  
 > Homelab opgebouwd op een Intel enterprise rack server met RAID storage, VLAN segmentatie, pfSense firewall, TrueNAS NAS, Windows Server 2022 met Active Directory en Proxmox VE als hypervisor.
 
