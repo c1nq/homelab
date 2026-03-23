@@ -1,0 +1,35 @@
+! Cisco Catalyst 3560 48-port FastEthernet
+! IOS Version 12.2(50)SE1
+! Homelab configuratie
+
+! SSH instellen
+ip domain-name homelab.local
+crypto key generate rsa modulus 1024
+username admin privilege 15 secret <wachtwoord>
+line vty 0 15
+ transport input ssh
+ login local
+ip ssh version 2
+
+! VLANs aanmaken
+vlan 10
+ name management
+vlan 20
+ name servers
+vlan 30
+ name storage
+
+! Trunk naar Proxmox server (Fa0/1)
+interface Fa0/1
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk allowed vlan 1,10,20,30
+
+! Trunk naar Netgear router (Fa0/3)
+interface Fa0/3
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk allowed vlan 1,10,20,30
+
+end
+write memory
