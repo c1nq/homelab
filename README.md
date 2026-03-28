@@ -5,8 +5,17 @@
 ![pfSense](https://img.shields.io/badge/pfSense-2.6.0-212121?style=for-the-badge&logo=pfsense&logoColor=white)
 ![TrueNAS](https://img.shields.io/badge/TrueNAS-SCALE%2024.04-0095D5?style=for-the-badge&logo=truenas&logoColor=white)
 ![Windows Server](https://img.shields.io/badge/Windows%20Server-2022-0078D6?style=for-the-badge&logo=windows&logoColor=white)
-![Debian](https://img.shields.io/badge/Debian-Trixie-A81D33?style=for-the-badge&logo=debian&logoColor=white)
+![Ubuntu](https://img.shields.io/badge/Ubuntu-24.04-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![Grafana](https://img.shields.io/badge/Grafana-F46800?style=for-the-badge&logo=grafana&logoColor=white)
+![Wazuh](https://img.shields.io/badge/Wazuh-SIEM-00A9E0?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-In%20Progress-yellow?style=for-the-badge)
+
+> **Vista College — Niveau 4 System Engineer**  
+> Homelab opgebouwd op een Intel enterprise rack server met RAID storage, VLAN segmentatie, pfSense firewall, TrueNAS NAS, Windows Server 2022 met Active Directory, Ubuntu Server met Docker/Ansible/Grafana/Wazuh SIEM en Proxmox VE als hypervisor.
+
+---
+
 ## 📸 Screenshots
 
 | Proxmox | TrueNAS |
@@ -16,8 +25,6 @@
 | Active Directory | Cisco Switch |
 |-----------------|--------------|
 | ![AD](screenshots/ad.png) | ![Cisco](screenshots/cisco.png) |
-> **Vista College — Niveau 4 System Engineer**  
-> Homelab opgebouwd op een Intel enterprise rack server met RAID storage, VLAN segmentatie, pfSense firewall, TrueNAS NAS, Windows Server 2022 met Active Directory en Proxmox VE als hypervisor.
 
 ---
 
@@ -27,7 +34,7 @@
 |-----------|-------|
 | 🖥️ Server | Intel R2312IP4LHPC (Nemko R2000 chassis) |
 | 🔌 Moederbord | Intel S2600IP dual-socket (1x CPU) |
-| 🧠 RAM | DDR3 ECC Registered |
+| 🧠 RAM | 64GB DDR3 ECC Registered |
 | 💾 RAID controller | Broadcom/LSI MegaRAID SAS 2208 |
 | 🔀 Switch | Cisco Catalyst 3560 48-port FastEthernet |
 | 🌐 Router | Netgear (192.168.1.254) |
@@ -85,6 +92,7 @@ Cisco Catalyst 3560 ── 192.168.1.2
 | pfSense LAN | 192.168.20.1 | Gateway VLAN 20 |
 | TrueNAS | 192.168.1.110 | NAS / SMB share |
 | Windows Server | 192.168.1.102 | AD, DNS, DHCP |
+| Ubuntu Server | 192.168.1.103 | Docker, Ansible, Grafana, Wazuh |
 | Cisco switch | 192.168.1.2 | Netwerk beheer |
 
 ---
@@ -140,11 +148,6 @@ echo "UUID=$(blkid -s UUID -o value /dev/sdc)  /mnt/storage-7tb  ext4  defaults 
 systemctl daemon-reload && mount -a
 ```
 
-| Storage ID | Pad | Capaciteit |
-|------------|-----|------------|
-| storage-2tb | /mnt/storage-2tb | 2.6 TB |
-| storage-7tb | /mnt/storage-7tb | 6.9 TB |
-
 ---
 
 ### Cisco Catalyst 3560 — VLANs & Trunks
@@ -186,9 +189,9 @@ ssh -oKexAlgorithms=+diffie-hellman-group1-sha1 \
 | VM ID | 100 |
 | CPU | 2 cores |
 | RAM | 2048 MB |
-| Disk | 20 GB (storage-7tb) |
-| WAN | 192.168.1.101 (vmbr0) |
-| LAN | 192.168.20.1 (vmbr0) |
+| Disk | 20 GB |
+| WAN | 192.168.1.101 |
+| LAN | 192.168.20.1 |
 | Webinterface | http://192.168.1.101 |
 | Versie | pfSense CE 2.6.0 |
 
@@ -201,13 +204,11 @@ ssh -oKexAlgorithms=+diffie-hellman-group1-sha1 \
 | VM ID | 101 |
 | CPU | 4 cores |
 | RAM | 8192 MB |
-| Boot disk | 50 GB (storage-7tb) |
+| Boot disk | 50 GB |
 | Data disks | 2x 500 GB Mirror (ZFS) |
 | IP | 192.168.1.110 |
 | Webinterface | http://192.168.1.110 |
-| Versie | TrueNAS SCALE 24.04 |
 | SMB share | \\192.168.1.110\data |
-| Pool | datapool — ZFS Mirror, 480 GB beschikbaar |
 
 ---
 
@@ -218,21 +219,45 @@ ssh -oKexAlgorithms=+diffie-hellman-group1-sha1 \
 | VM ID | 102 |
 | CPU | 4 cores |
 | RAM | 4096 MB |
-| Disk | 60 GB (storage-7tb) |
+| Disk | 60 GB |
 | IP | 192.168.1.102 |
-| Versie | Windows Server 2022 Standard Evaluation |
 | Domein | homelab.local |
 
-**Active Directory configuratie:**
-- Forest/Domain: `homelab.local`
-- Functional level: Windows Server 2016
+**Active Directory:**
 - OUs: `Medewerkers`, `Werkstations`, `IT-Beheer`
 - Gebruiker: `s.enkelmans@homelab.local`
 
-**DHCP scope:**
-- Range: `192.168.1.150 — 192.168.1.200`
-- Gateway: `192.168.1.254`
-- DNS: `192.168.1.102`
+**DHCP scope:** `192.168.1.150 — 192.168.1.200`
+
+---
+
+### Ubuntu Server — Docker/Ansible/Monitoring VM
+
+| Instelling | Waarde |
+|-----------|--------|
+| VM ID | 103 |
+| CPU | 4 cores |
+| RAM | 4096 MB |
+| Disk | 40 GB |
+| IP | 192.168.1.103 |
+| OS | Ubuntu 24.04 LTS |
+
+**Draaiende services:**
+
+| Service | Poort | Beschrijving |
+|---------|-------|--------------|
+| Portainer | 9000 | Docker beheer GUI |
+| Prometheus | 9090 | Metrics collectie |
+| Grafana | 3000 | Monitoring dashboard |
+| Node Exporter | 9100 | Server metrics |
+| Wazuh Manager | 443 | SIEM dashboard |
+| Wazuh Indexer | 9200 | Log opslag |
+
+**Wazuh agents:**
+| Agent | IP | OS | Status |
+|-------|----|----|--------|
+| ubuntu-server | 192.168.1.103 | Ubuntu 24.04 | ✅ Active |
+| windows-server | 192.168.1.102 | Windows Server 2022 | ✅ Active |
 
 ---
 
@@ -246,20 +271,15 @@ ssh -oKexAlgorithms=+diffie-hellman-group1-sha1 \
 - [x] Cisco 3560 geconfigureerd met VLAN 10 / 20 / 30
 - [x] Trunk poorten actief op Fa0/1 en Fa0/3
 - [x] SSH toegang op Cisco switch
-- [x] Proxmox VLAN interfaces actief (vmbr0.10 / .20 / .30)
+- [x] Proxmox VLAN interfaces actief
 - [x] pfSense VM geïnstalleerd en geconfigureerd
-- [x] pfSense webinterface bereikbaar via WAN
-- [x] TrueNAS SCALE VM geïnstalleerd
-- [x] ZFS Mirror pool aangemaakt (2x 500GB)
+- [x] TrueNAS SCALE VM met ZFS Mirror pool
 - [x] SMB share actief en bereikbaar vanaf Windows
-- [x] Windows Server 2022 VM geïnstalleerd
-- [x] Active Directory domein `homelab.local` opgezet
-- [x] DNS server geconfigureerd
-- [x] DHCP scope aangemaakt en actief
-- [x] Gebruiker `s.enkelmans@homelab.local` aangemaakt
-- [ ] Ubuntu Server met Ansible + Docker
-- [ ] Grafana + Prometheus monitoring
-- [ ] Wazuh SIEM
+- [x] Windows Server 2022 met AD, DNS, DHCP
+- [x] Ubuntu Server met Docker + Ansible
+- [x] Portainer dashboard
+- [x] Grafana + Prometheus + Node Exporter
+- [x] Wazuh SIEM met 2 actieve agents
 - [ ] Kali Linux VM
 - [ ] WireGuard VPN
 - [ ] Gitea + CI/CD pipeline
