@@ -10,10 +10,12 @@
 ![Grafana](https://img.shields.io/badge/Grafana-F46800?style=for-the-badge&logo=grafana&logoColor=white)
 ![Wazuh](https://img.shields.io/badge/Wazuh-SIEM-00A9E0?style=for-the-badge)
 ![Kali](https://img.shields.io/badge/Kali-Linux-557C94?style=for-the-badge&logo=kalilinux&logoColor=white)
-![Status](https://img.shields.io/badge/Status-In%20Progress-yellow?style=for-the-badge)
+![WireGuard](https://img.shields.io/badge/WireGuard-VPN-88171A?style=for-the-badge&logo=wireguard&logoColor=white)
+![Gitea](https://img.shields.io/badge/Gitea-CI%2FCD-609926?style=for-the-badge&logo=gitea&logoColor=white)
+![Status](https://img.shields.io/badge/Status-Compleet-brightgreen?style=for-the-badge)
 
 > **Vista College — Niveau 4 System Engineer**
-> Homelab opgebouwd op een Intel enterprise rack server met RAID storage, VLAN segmentatie, pfSense firewall, TrueNAS NAS, Windows Server 2022 met Active Directory, Ubuntu Server met Docker/Ansible/Grafana/Wazuh SIEM, Kali Linux en Proxmox VE als hypervisor.
+> Volledig enterprise homelab opgebouwd op een Intel rack server met RAID storage, VLAN segmentatie, pfSense firewall, TrueNAS NAS, Windows Server 2022 met Active Directory, Ubuntu Server met Docker/Ansible/Grafana/Wazuh SIEM, Kali Linux security testing, WireGuard VPN en Gitea CI/CD pipeline.
 
 ---
 
@@ -93,7 +95,7 @@ Cisco Catalyst 3560 ── 192.168.1.2
 | pfSense LAN | 192.168.20.1 | Gateway VLAN 20 |
 | TrueNAS | 192.168.1.110 | NAS / SMB share |
 | Windows Server | 192.168.1.102 | AD, DNS, DHCP |
-| Ubuntu Server | 192.168.1.103 | Docker, Ansible, Grafana, Wazuh |
+| Ubuntu Server | 192.168.1.103 | Docker, Ansible, Grafana, Wazuh, Gitea, WireGuard |
 | Kali Linux | 192.168.1.104 | Security testing |
 | Cisco switch | 192.168.1.2 | Netwerk beheer |
 
@@ -101,7 +103,7 @@ Cisco Catalyst 3560 ── 192.168.1.2
 
 ## ⚙️ Configuratie
 
-### Proxmox — /etc/network/interfaces
+### Proxmox — `/etc/network/interfaces`
 ```bash
 auto vmbr0
 iface vmbr0 inet static
@@ -133,17 +135,6 @@ dpkg -i libncurses5_6.4-4_amd64.deb
 
 /opt/MegaRAID/MegaCli/MegaCli64 -PDList -aALL | grep -E "Slot Number|Raw Size|Firmware state"
 /opt/MegaRAID/MegaCli/MegaCli64 -LDInfo -Lall -aALL
-```
-
-### Storage — Mounten in Proxmox
-```bash
-mkfs.ext4 /dev/sdb
-mkfs.ext4 /dev/sdc
-mkdir -p /mnt/storage-2tb
-mkdir -p /mnt/storage-7tb
-echo "UUID=  /mnt/storage-2tb  ext4  defaults  0  2" >> /etc/fstab
-echo "UUID=  /mnt/storage-7tb  ext4  defaults  0  2" >> /etc/fstab
-systemctl daemon-reload && mount -a
 ```
 
 ### Cisco Catalyst 3560 — VLANs & Trunks
@@ -183,7 +174,6 @@ ssh -oKexAlgorithms=+diffie-hellman-group1-sha1 \
 | VM ID | 100 |
 | CPU | 2 cores |
 | RAM | 2048 MB |
-| Disk | 20 GB |
 | WAN | 192.168.1.101 |
 | LAN | 192.168.20.1 |
 | Versie | pfSense CE 2.6.0 |
@@ -195,7 +185,6 @@ ssh -oKexAlgorithms=+diffie-hellman-group1-sha1 \
 | VM ID | 101 |
 | CPU | 4 cores |
 | RAM | 8192 MB |
-| Boot disk | 50 GB |
 | Data disks | 2x 500 GB Mirror (ZFS) |
 | IP | 192.168.1.110 |
 | Pool | datapool — ZFS Mirror, 480 GB |
@@ -207,7 +196,6 @@ ssh -oKexAlgorithms=+diffie-hellman-group1-sha1 \
 | VM ID | 102 |
 | CPU | 4 cores |
 | RAM | 4096 MB |
-| Disk | 60 GB |
 | IP | 192.168.1.102 |
 | Domein | homelab.local |
 
@@ -224,13 +212,15 @@ ssh -oKexAlgorithms=+diffie-hellman-group1-sha1 \
 | IP | 192.168.1.103 |
 | OS | Ubuntu 24.04 LTS |
 
-| Service | Poort |
-|---------|-------|
-| Portainer | 9000 |
-| Prometheus | 9090 |
-| Grafana | 3000 |
-| Node Exporter | 9100 |
-| Wazuh Dashboard | 443 |
+| Service | Poort | Functie |
+|---------|-------|---------|
+| Portainer | 9000 | Docker beheer |
+| Prometheus | 9090 | Metrics |
+| Grafana | 3000 | Monitoring dashboard |
+| Node Exporter | 9100 | Server metrics |
+| Wazuh Dashboard | 443 | SIEM |
+| Gitea | 3001 | Git server + CI/CD |
+| WireGuard | 51820/UDP | VPN |
 
 ### Wazuh SIEM — Agents
 
@@ -244,8 +234,6 @@ ssh -oKexAlgorithms=+diffie-hellman-group1-sha1 \
 | Instelling | Waarde |
 |-----------|--------|
 | VM ID | 104 |
-| CPU | 2 cores |
-| RAM | 2048 MB |
 | IP | 192.168.1.104 |
 | OS | Kali Linux 2025.4 |
 | Tools | Nmap 7.98, Metasploit 6.4 |
@@ -255,26 +243,22 @@ ssh -oKexAlgorithms=+diffie-hellman-group1-sha1 \
 ## ✅ Voortgang
 
 - [x] Proxmox VE 9.1.1 geïnstalleerd
-- [x] Repository geconfigureerd (no-subscription)
 - [x] MegaCLI64 werkend — alle 12 schijven zichtbaar
 - [x] RAID arrays geïdentificeerd (RAID-1 + 2x RAID-6)
-- [x] 2.7 TB + 7.3 TB storage gemount en toegevoegd aan Proxmox
+- [x] 2.7 TB + 7.3 TB storage gemount
 - [x] Cisco 3560 geconfigureerd met VLAN 10 / 20 / 30
-- [x] Trunk poorten actief op Fa0/1 en Fa0/3
 - [x] SSH toegang op Cisco switch
-- [x] Proxmox VLAN interfaces actief
-- [x] pfSense VM geïnstalleerd en geconfigureerd
+- [x] pfSense firewall VM
 - [x] TrueNAS SCALE VM met ZFS Mirror pool
-- [x] SMB share actief en bereikbaar vanaf Windows
+- [x] SMB share actief
 - [x] Windows Server 2022 met AD, DNS, DHCP
 - [x] Ubuntu Server met Docker + Ansible
-- [x] Portainer dashboard
 - [x] Grafana + Prometheus + Node Exporter
 - [x] Wazuh SIEM met 2 actieve agents
 - [x] Kali Linux VM met Nmap + Metasploit
 - [x] Netwerk discovery scan uitgevoerd
-- [ ] WireGuard VPN
-- [ ] Gitea + CI/CD pipeline
+- [x] WireGuard VPN
+- [x] Gitea Git server + CI/CD pipeline
 
 ---
 
