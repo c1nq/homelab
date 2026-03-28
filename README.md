@@ -103,7 +103,7 @@ Cisco Catalyst 3560 ── 192.168.1.2
 
 ## ⚙️ Configuratie
 
-### Proxmox — `/etc/network/interfaces`
+### Proxmox — /etc/network/interfaces
 ```bash
 auto vmbr0
 iface vmbr0 inet static
@@ -237,6 +237,22 @@ ssh -oKexAlgorithms=+diffie-hellman-group1-sha1 \
 | IP | 192.168.1.104 |
 | OS | Kali Linux 2025.4 |
 | Tools | Nmap 7.98, Metasploit 6.4 |
+
+### WireGuard VPN
+
+| Instelling | Waarde |
+|-----------|--------|
+| Server IP | 10.0.0.1 |
+| Client IP | 10.0.0.2 |
+| Poort | 51820/UDP |
+| AllowedIPs | 192.168.1.0/24 |
+
+### Gitea CI/CD
+
+| Instelling | Waarde |
+|-----------|--------|
+| URL | http://192.168.1.103:3001 |
+| Runner | homelab-runner (Docker) |
 
 ---
 
